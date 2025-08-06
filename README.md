@@ -1,40 +1,55 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/pages/api-reference/create-next-app).
+# Next.js×TypeScript×Storybook×MSW
+モックサーバーを用いたフロントエンド開発  
+共通で使用するUIコンポーネントをカタログ化  
 
-## Getting Started
+# StrybookとMSWのインストールとセットアップ  
+next.jsはcreate-appで導入  
 
-First, run the development server:
+## Storybookのインストール  
+npx storybook@latest init --builder webpack5 --type react  
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+※npx storybook initでインストールするとvite環境に合わせたセットアップになったので今回このコマンドは使わない  
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## MSWのインストール  
+StorybookやNext.js、Node.js CLI実行などの互換性が高く、現状では最も安定するバージョン1をインストール  
 
-You can start editing the page by modifying `pages/index.tsx`. The page auto-updates as you edit the file.
+npm install msw@1 --save-dev  
+npm install msw-storybook-addon@^1 --save-dev  
 
-[API routes](https://nextjs.org/docs/pages/building-your-application/routing/api-routes) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.ts`.
+mockServiceWorker.jsをpublic配下に配置する  
+npx msw init public/ --save  
 
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/pages/building-your-application/routing/api-routes) instead of React pages.
+.storybook/main.tsに追加  
+const config: StorybookConfig = {  
+  staticDirs: ['../public']  
+};  
 
-This project uses [`next/font`](https://nextjs.org/docs/pages/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+.storybook/preview.tsに追加  
+import { initialize, mswDecorator } from "msw-storybook-addon";  
+initialize();  
+const preview: Preview = {  
+  decorators: [mswDecorator],  
+};  
 
-## Learn More
+# 確認する設定項目  
+恐らく、tsconfig.jsonは以下の設定になっている  
+{  
+  "compilerOptions": {  
+    "moduleResolution": "bundler",  
+    "jsx": "preserve"  
+  }  
+}  
 
-To learn more about Next.js, take a look at the following resources:
+もし上記でうまく動作しなかったら以下を試す  
+{  
+  "compilerOptions": {  
+    "jsx": "react-jsx",  
+    "moduleResolution": "node",  
+  }  
+}  
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn-pages-router) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/pages/building-your-application/deploying) for more details.
+# MSWバージョン2以上の使用は非推奨    
+npm install mswでインストールすると恐らくバージョン2以上がインストールされる  
+もしmsw@2 を使いたいなら、完全にESM対応された環境であることが前提  
+msw@2.xがESM(ECMAScript Modules)モジュールになっているためTypeScript の型解決エラーが出る  
+現時点でESMの完全対応は Storybook v9.x など一部で不完全なため、非推奨になっている  
