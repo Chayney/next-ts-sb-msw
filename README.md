@@ -20,32 +20,32 @@ mockServiceWorker.jsをpublic配下に配置する
 npx msw init public/ --save  
 
 .storybook/main.tsに追加  
-const config: StorybookConfig = {
-  staticDirs: ['../public']
+const config: StorybookConfig = {  
+  staticDirs: ['../public']  
 };  
 
 .storybook/preview.tsに追加  
-import { initialize, mswDecorator } from "msw-storybook-addon";
-initialize();
-const preview: Preview = {
-  decorators: [mswDecorator],
+import { initialize, mswDecorator } from "msw-storybook-addon";  
+initialize();  
+const preview: Preview = {  
+  decorators: [mswDecorator],  
 };  
 
 # 確認する設定項目  
 恐らく、tsconfig.jsonは以下の設定になっている  
-{
-  "compilerOptions": {
-    "moduleResolution": "bundler",
-    "jsx": "preserve"
-  }
-}
+{  
+  "compilerOptions": {  
+    "moduleResolution": "bundler",  
+    "jsx": "preserve"  
+  }  
+}  
 
 もし上記でうまく動作しなかったら以下を試す  
-{
-  "compilerOptions": {
-    "jsx": "react-jsx",
-    "moduleResolution": "node",
-  }
+{  
+  "compilerOptions": {  
+    "jsx": "react-jsx",  
+    "moduleResolution": "node",  
+  }  
 }  
 
 # MSWバージョン2以上の使用は非推奨    
